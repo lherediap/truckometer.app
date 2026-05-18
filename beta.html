@@ -218,6 +218,57 @@
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+    /* ─── MOBILE NAV ─── */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: .4rem; background: none; border: none;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--white); border-radius: 2px;
+      transition: transform .25s, opacity .25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem; z-index: 99; flex-direction: column; gap: .2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--muted); text-decoration: none;
+      font-size: 1rem; letter-spacing: .08em; text-transform: uppercase;
+      font-weight: 500; padding: .7rem 0;
+      border-bottom: 1px solid var(--border);
+      display: block;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--amber); }
+    @media (max-width: 680px) {
+      .nav-links { display: none; }
+      .nav-cta   { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .hero { padding: 7rem 1.2rem 3rem; }
+      section { padding: 4rem 1.2rem; }
+      .stat-bar { padding: 1.5rem 1.2rem; }
+      .tester-inner { flex-direction: column; }
+      .tester-actions { width: 100%; }
+      .tester-actions .btn-primary,
+      .tester-actions .btn-ghost { width: 100%; text-align: center; }
+      footer { flex-direction: column; gap: 1rem; padding: 2rem 1.2rem; }
+      .footer-links { flex-wrap: wrap; gap: 1rem; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn-primary,
+      .hero-actions .btn-ghost { width: 100%; text-align: center; }
+      .form-card { padding: 1.5rem 1.2rem; }
+      .perks { flex-direction: column; align-items: flex-start; gap: .8rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -233,7 +284,17 @@
     <li><a href="report.html">Bug Report</a></li>
     <li><a href="beta.html" class="active">Beta</a></li>
   </ul>
+
+  <button class="hamburger" id="hbg" aria-label="Toggle menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="docs.html">Manual</a>
+  <a href="beta.html" class="active">Beta</a>
+  <a href="report.html">Bug Report</a>
+</div>
 
 <!-- ─── HERO ─── -->
 <div class="page-hero">
@@ -417,6 +478,22 @@ Biggest pain point: ${pain}`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 800);
 }
+</script>
+
+<script>
+function toggleMenu(){
+  var h=document.getElementById('hbg');
+  var m=document.getElementById('mobileMenu');
+  h.classList.toggle('open');
+  m.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var h=document.getElementById('hbg');
+  var m=document.getElementById('mobileMenu');
+  if(!h.contains(e.target)&&!m.contains(e.target)){
+    h.classList.remove('open');m.classList.remove('open');
+  }
+});
 </script>
 </body>
 </html>
