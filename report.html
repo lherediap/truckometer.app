@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruckOmeter — Report a Bug</title>
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0b0d; --dark: #111318; --panel: #181b22;
+      --border: #252930; --amber: #f5a623; --amber2: #e8920e;
+      --white: #f0ede8; --muted: #8a8f99; --road: #1e2129;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,11,13,.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 64px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .nav-logo img { width: 34px; height: 34px; border-radius: 5px; }
+    .nav-logo span { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--amber); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a.active { color: var(--amber); }
+
+    .page-wrap { max-width: 760px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 2.8rem; text-transform: uppercase; line-height: 1;
+      margin-bottom: .5rem;
+    }
+    h1 em { color: var(--amber); font-style: normal; }
+    .subtitle { color: var(--muted); margin-bottom: 2.5rem; font-size: 1rem; }
+
+    /* method cards */
+    .method-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+    @media (max-width: 600px) { .method-grid { grid-template-columns: 1fr; } }
+
+    .method-card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.8rem 1.5rem;
+      text-decoration: none; color: inherit;
+      transition: border-color .2s, transform .15s;
+      display: flex; flex-direction: column;
+    }
+    .method-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+    .method-card.primary { border-color: rgba(245,166,35,.4); }
+    .method-icon { font-size: 2rem; margin-bottom: .8rem; }
+    .method-card h3 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1.15rem; text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: .4rem;
+    }
+    .method-card p { font-size: .88rem; color: var(--muted); line-height: 1.6; flex: 1; }
+    .method-badge {
+      margin-top: 1rem; align-self: flex-start;
+      font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .2rem .6rem; border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    }
+    .badge-recommended { background: rgba(245,166,35,.2); color: var(--amber); border: 1px solid rgba(245,166,35,.4); }
+    .badge-email { background: rgba(76,159,245,.15); color: #5ab0ff; border: 1px solid rgba(76,159,245,.3); }
+
+    /* divider */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+    /* template */
+    .template-box {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1.8rem;
+    }
+    .template-box h2 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1.3rem; text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: 1.2rem; color: var(--white);
+    }
+    .field-group { margin-bottom: 1.2rem; }
+    .field-label {
+      font-size: .75rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--amber); font-weight: 600; margin-bottom: .35rem;
+      display: block;
+    }
+    .field-value {
+      background: var(--road); border: 1px solid var(--border);
+      border-radius: 4px; padding: .65rem .9rem;
+      font-size: .9rem; color: var(--muted); line-height: 1.6;
+      user-select: all;
+    }
+    .copy-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); padding: .3rem .75rem;
+      font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+      cursor: pointer; border-radius: 3px; margin-top: .5rem;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+      transition: color .2s, border-color .2s;
+    }
+    .copy-btn:hover { color: var(--white); border-color: var(--amber); }
+    .copy-btn.copied { color: #4caf7d; border-color: #4caf7d; }
+
+    /* instructions */
+    .instructions ol { margin: 1rem 0 0 1.4rem; }
+    .instructions li { margin-bottom: .6rem; font-size: .92rem; color: #ccc9c2; }
+    .instructions strong { color: var(--white); }
+    .instructions a { color: var(--amber); }
+
+    /* callout */
+    .callout {
+      border-left: 3px solid var(--amber); background: var(--panel);
+      padding: .9rem 1.1rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0;
+    }
+    .callout p { margin: 0; font-size: .9rem; color: #ccc9c2; }
+    .callout strong { color: var(--white); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="logo.png" alt="TruckOmeter">
+    <span>TruckOmeter</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="docs.html">Manual</a></li>
+    <li><a href="report.html" class="active">Report a Bug</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <h1>Report a <em>Bug</em></h1>
+  <p class="subtitle">Found something broken? Help us fix it. Choose your preferred method below.</p>
+
+  <div class="method-grid">
+    <a class="method-card primary" href="https://github.com/lherediap/truckometer.app/issues/new?template=bug_report.md" target="_blank">
+      <span class="method-icon">🐛</span>
+      <h3>GitHub Issue</h3>
+      <p>Opens a pre-filled bug report template in GitHub. Tracked, searchable, and most useful to the development team.</p>
+      <span class="method-badge badge-recommended">Recommended</span>
+    </a>
+    <a class="method-card" href="mailto:work.lehp@yahoo.com?subject=TruckOmeter%20Bug%20Report&body=WHAT%20HAPPENED%3A%0A%0ASTEPS%20TO%20REPRODUCE%3A%0A1.%0A2.%0A3.%0A%0AEXPECTED%3A%0A%0AACTUAL%3A%0A%0AWINDOWS%20VERSION%3A%0AAPP%20VERSION%3A">
+      <span class="method-icon">📧</span>
+      <h3>Email</h3>
+      <p>Prefer email? Opens your mail client with a pre-filled bug report template ready to fill in.</p>
+      <span class="method-badge badge-email">work.lehp@yahoo.com</span>
+    </a>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Bug report template -->
+  <div class="template-box">
+    <h2>What to Include in Your Report</h2>
+
+    <div class="field-group">
+      <label class="field-label">1. What happened?</label>
+      <div class="field-value">Describe the bug clearly. What did you see? What went wrong?</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">2. Steps to reproduce</label>
+      <div class="field-value">
+        1. Open [screen name]<br>
+        2. Do [specific action]<br>
+        3. See [what went wrong]
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">3. Expected vs. Actual</label>
+      <div class="field-value">
+        Expected: what should have happened<br>
+        Actual: what actually happened
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">4. Environment</label>
+      <div class="field-value">
+        Windows version: (e.g. Windows 11 24H2)<br>
+        App version: (found in Settings → About)
+      </div>
+    </div>
+
+    <button class="copy-btn" id="copyBtn" onclick="copyTemplate()">Copy Template</button>
+  </div>
+
+  <hr class="divider">
+
+  <div class="instructions">
+    <h2 style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1.3rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.8rem;">
+      How to File a GitHub Issue
+    </h2>
+    <ol>
+      <li>Click <strong>GitHub Issue</strong> above — it opens a new issue with the bug report template pre-filled.</li>
+      <li>You <strong>do not need a GitHub account</strong> if the repo is set to allow anonymous issues. If prompted to sign in, create a free GitHub account (takes 60 seconds).</li>
+      <li>Fill in each section: what happened, steps to reproduce, expected vs. actual, and your Windows + app version.</li>
+      <li>Add a <strong>screenshot</strong> if possible — drag and drop it directly into the text box.</li>
+      <li>Click <strong>Submit new issue</strong>. You'll receive email updates as the bug is reviewed and fixed.</li>
+    </ol>
+  </div>
+
+  <div class="callout">
+    <p><strong>Not sure if it's a bug?</strong> Submit it anyway. What seems like user error might
+    reveal a UX problem worth fixing. Every report is valuable — even "I couldn't figure out how to do X."</p>
+  </div>
+
+</div>
+
+<script>
+function copyTemplate() {
+  const template = `WHAT HAPPENED:
+[Describe what went wrong]
+
+STEPS TO REPRODUCE:
+1. 
+2. 
+3. 
+
+EXPECTED:
+[What should have happened]
+
+ACTUAL:
+[What actually happened]
+
+ENVIRONMENT:
+Windows version: 
+App version: (Settings → About)
+
+SCREENSHOT:
+[Attach if available]`;
+
+  navigator.clipboard.writeText(template).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Template';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+</script>
+</body>
+</html>

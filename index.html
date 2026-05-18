@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruckOmeter — Know Your Numbers. Own the Road.</title>
+  <meta name="description" content="TruckOmeter is the financial intelligence app for owner-operators. Loads, fuel, IFTA, ROI — all in one place.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black:   #0a0b0d;
+      --dark:    #111318;
+      --panel:   #181b22;
+      --border:  #252930;
+      --amber:   #f5a623;
+      --amber2:  #e8920e;
+      --white:   #f0ede8;
+      --muted:   #8a8f99;
+      --road:    #1e2129;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,11,13,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .nav-logo img { width: 36px; height: 36px; border-radius: 6px; }
+    .nav-logo span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 1.4rem; letter-spacing: .04em;
+      color: var(--amber);
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: .85rem; letter-spacing: .08em; text-transform: uppercase;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--amber); color: var(--black);
+      padding: .45rem 1.2rem; border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: .9rem; letter-spacing: .06em;
+      text-decoration: none; text-transform: uppercase;
+      transition: background .2s;
+    }
+    .nav-cta:hover { background: var(--amber2); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 9rem 2.5rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Road stripe background */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0,
+          transparent calc(50% - 2px),
+          rgba(245,166,35,.06) calc(50% - 2px),
+          rgba(245,166,35,.06) calc(50% + 2px),
+          transparent calc(50% + 2px)
+        ),
+        radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245,166,35,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* Subtle grid */
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: .3;
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 900px; margin: 0 auto; position: relative; z-index: 2;
+    }
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .8rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 1.2rem;
+      opacity: 0; animation: fadeUp .6s ease forwards .1s;
+    }
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      line-height: .95; letter-spacing: -.01em;
+      text-transform: uppercase;
+      opacity: 0; animation: fadeUp .6s ease forwards .25s;
+    }
+    h1 em { color: var(--amber); font-style: normal; }
+    .hero-sub {
+      max-width: 600px; margin-top: 1.8rem;
+      font-size: 1.15rem; color: var(--muted); font-weight: 300;
+      opacity: 0; animation: fadeUp .6s ease forwards .4s;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .6s ease forwards .55s;
+    }
+    .btn-primary {
+      background: var(--amber); color: var(--black);
+      padding: .8rem 2rem; border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1rem; letter-spacing: .08em;
+      text-decoration: none; text-transform: uppercase;
+      transition: background .2s, transform .15s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--amber2); transform: translateY(-2px); }
+    .btn-ghost {
+      border: 1px solid var(--border); color: var(--white);
+      padding: .8rem 2rem; border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600; font-size: 1rem; letter-spacing: .08em;
+      text-decoration: none; text-transform: uppercase;
+      transition: border-color .2s, transform .15s;
+      display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--amber); transform: translateY(-2px); }
+
+    .hero-logo {
+      position: absolute; right: -60px; top: 50%; transform: translateY(-50%);
+      width: 420px; opacity: .12;
+      filter: grayscale(1) contrast(1.2);
+      pointer-events: none;
+      display: none;
+    }
+    @media (min-width: 1100px) { .hero-logo { display: block; } }
+
+    /* ─── STAT BAR ─── */
+    .stat-bar {
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+    }
+    .stat-bar-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 2rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 2.8rem;
+      color: var(--amber); line-height: 1;
+    }
+    .stat-label {
+      font-size: .75rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--muted); margin-top: .3rem;
+    }
+
+    /* ─── FEATURES ─── */
+    section { padding: 6rem 2.5rem; }
+    .section-inner { max-width: 900px; margin: 0 auto; }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .75rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: .8rem;
+    }
+    h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem);
+      text-transform: uppercase; line-height: 1; letter-spacing: -.01em;
+      margin-bottom: 1.2rem;
+    }
+    .lead { font-size: 1.05rem; color: var(--muted); max-width: 540px; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5px;
+      margin-top: 3.5rem;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .feature-card {
+      background: var(--dark);
+      padding: 2.2rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: background .2s;
+    }
+    .feature-card:hover { background: var(--panel); }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 3px; height: 0;
+      background: var(--amber);
+      transition: height .3s ease;
+    }
+    .feature-card:hover::before { height: 100%; }
+    .feature-icon {
+      font-size: 1.8rem; margin-bottom: 1rem; display: block;
+    }
+    .feature-card h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1.1rem;
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+    .feature-card p { font-size: .9rem; color: var(--muted); line-height: 1.65; }
+
+    /* ─── PLATFORMS ─── */
+    .platform-section { background: var(--road); }
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .platform-card {
+      border: 1px solid var(--border);
+      padding: 1.8rem 1.5rem;
+      border-radius: 6px;
+      text-align: center;
+      transition: border-color .2s;
+    }
+    .platform-card:hover { border-color: var(--amber); }
+    .platform-icon { font-size: 2.5rem; margin-bottom: .8rem; display: block; }
+    .platform-card h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; margin-bottom: .3rem;
+    }
+    .platform-card .status {
+      font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .status-live { color: #4caf7d; }
+    .status-soon { color: var(--amber); }
+
+    /* ─── TESTER CTA ─── */
+    .tester-section {
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .tester-inner {
+      max-width: 900px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 3rem; flex-wrap: wrap;
+    }
+    .tester-inner h2 { margin-bottom: .5rem; }
+    .tester-inner .lead { margin-bottom: 0; }
+    .tester-actions { display: flex; gap: 1rem; flex-shrink: 0; flex-wrap: wrap; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 3rem 2.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    .footer-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 1.2rem;
+      color: var(--amber); letter-spacing: .04em;
+    }
+    footer p { font-size: .8rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: .8rem; color: var(--muted);
+      text-decoration: none; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <img src="logo.png" alt="TruckOmeter">
+    <span>TruckOmeter</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="docs.html">Manual</a></li>
+    <li><a href="report.html">Testers</a></li>
+  </ul>
+  <a class="nav-cta" href="https://apps.microsoft.com/detail/9P06LH9ZC9TV" target="_blank">Download</a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <img class="hero-logo" src="logo.png" alt="">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Owner-Operator Intelligence</p>
+    <h1>Know Your<br><em>Numbers.</em><br>Own the Road.</h1>
+    <p class="hero-sub">
+      TruckOmeter tracks your loads, fuel, and expenses — then turns that data
+      into your real operating income. Built by a trucker, for truckers.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://apps.microsoft.com/detail/9P06LH9ZC9TV" target="_blank">
+        Get it on Windows
+      </a>
+      <a class="btn-ghost" href="docs.html">Read the Manual</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STAT BAR ─── -->
+<div class="stat-bar">
+  <div class="stat-bar-inner">
+    <div class="stat">
+      <div class="stat-num">ROI</div>
+      <div class="stat-label">Real Operating Income</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">IFTA</div>
+      <div class="stat-label">Automated Tax Reports</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">DTR</div>
+      <div class="stat-label">Detention Time Reports</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">HOS</div>
+      <div class="stat-label">Hours of Service Insight</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FEATURES ─── -->
+<section id="features">
+  <div class="section-inner">
+    <p class="section-label reveal">What TruckOmeter Does</p>
+    <h2 class="reveal">Everything in<br>One <em style="color:var(--amber)">Dashboard</em></h2>
+    <p class="lead reveal">
+      We aren't an ELD and we aren't an accounting app — we're the tool
+      that connects the dots between your miles and your money.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <span class="feature-icon">📦</span>
+        <h3>Load Tracking</h3>
+        <p>Log pickups, deliveries, rates, and detention time for every load.
+           See exactly where your revenue is coming from.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">⛽</span>
+        <h3>Fuel Analysis</h3>
+        <p>Track every fill-up, MPG, DEF usage, and diesel price arbitrage
+           across state lines. Know where to fuel and when.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">📊</span>
+        <h3>Real ROI</h3>
+        <p>Driver pay, fuel, expenses, and depreciation — all counted so your
+           net per mile is accurate before you accept a load.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🗺️</span>
+        <h3>IFTA Reports</h3>
+        <p>State-by-state mileage automatically calculated from your load data.
+           Generate your quarterly IFTA report in minutes.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">⏱️</span>
+        <h3>Detention Time</h3>
+        <p>Log detention at pickup and delivery. Build a documented history
+           to support detention fee claims with your broker.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🛣️</span>
+        <h3>Route Planning</h3>
+        <p>Segment-aware routing with fuel stop recommendations based on
+           diesel prices and your tank capacity.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🧑‍✈️</span>
+        <h3>Driver Pay</h3>
+        <p>Calculate driver pay per mile or per load — always shown as a real
+           business cost, even if you're the driver.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">🔧</span>
+        <h3>Maintenance Log</h3>
+        <p>Track service intervals, costs, and upcoming maintenance per truck
+           and trailer. Stay ahead of breakdowns.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PLATFORMS ─── -->
+<section class="platform-section">
+  <div class="section-inner">
+    <p class="section-label reveal">Availability</p>
+    <h2 class="reveal">Your Platform,<br>Your Choice</h2>
+    <p class="lead reveal">
+      TruckOmeter is built with .NET MAUI — one codebase, every platform.
+    </p>
+    <div class="platform-grid">
+      <div class="platform-card reveal">
+        <span class="platform-icon">🖥️</span>
+        <h4>Windows</h4>
+        <span class="status status-live">● Live on Microsoft Store</span>
+      </div>
+      <div class="platform-card reveal">
+        <span class="platform-icon">📱</span>
+        <h4>Android</h4>
+        <span class="status status-soon">○ Coming Soon</span>
+      </div>
+      <div class="platform-card reveal">
+        <span class="platform-icon">🍎</span>
+        <h4>iOS / iPhone</h4>
+        <span class="status status-soon">○ Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTER CTA ─── -->
+<section class="tester-section">
+  <div class="tester-inner">
+    <div>
+      <p class="section-label">Beta Program</p>
+      <h2 class="reveal">Are You a Tester?</h2>
+      <p class="lead reveal">Read the manual, report bugs, and help shape the road ahead.</p>
+    </div>
+    <div class="tester-actions reveal">
+      <a class="btn-primary" href="docs.html">Open Manual</a>
+      <a class="btn-ghost" href="report.html">Report a Bug</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <span class="footer-brand">TruckOmeter</span>
+  <p>© 2026 P.A.S. &nbsp;·&nbsp; Built by owner-operators, for owner-operators.</p>
+  <div class="footer-links">
+    <a href="docs.html">Manual</a>
+    <a href="report.html">Bug Report</a>
+    <a href="https://www.privacypolicies.com/live/106343d3-9cef-4cbb-a622-3d6e77472842" target="_blank">Privacy</a>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => io.observe(r));
+</script>
+</body>
+</html>

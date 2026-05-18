@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruckOmeter — Tester Manual</title>
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0b0d; --dark: #111318; --panel: #181b22;
+      --border: #252930; --amber: #f5a623; --amber2: #e8920e;
+      --white: #f0ede8; --muted: #8a8f99; --road: #1e2129;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; font-weight: 400; line-height: 1.7; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,11,13,.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 64px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .nav-logo img { width: 34px; height: 34px; border-radius: 5px; }
+    .nav-logo span { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.3rem; color: var(--amber); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a.active { color: var(--amber); }
+
+    /* layout */
+    .page { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* sidebar */
+    .sidebar {
+      width: 230px; flex-shrink: 0;
+      padding: 3rem 0 3rem 1rem;
+      position: sticky; top: 64px; height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+    .sidebar-group { margin-bottom: 2rem; }
+    .sidebar-group-title {
+      font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600; margin-bottom: .6rem;
+      padding-left: .75rem;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar a {
+      display: block; padding: .35rem .75rem;
+      color: var(--muted); text-decoration: none; font-size: .88rem;
+      border-left: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .sidebar a:hover { color: var(--white); border-color: var(--border); }
+    .sidebar a.active { color: var(--amber); border-color: var(--amber); }
+
+    /* content */
+    .content {
+      flex: 1; padding: 3rem 1.5rem 6rem 3rem;
+      min-width: 0;
+    }
+
+    /* headings */
+    .content h1 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 2.8rem; text-transform: uppercase; line-height: 1;
+      color: var(--white); margin-bottom: .5rem;
+    }
+    .content h1 em { color: var(--amber); font-style: normal; }
+    .content h2 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1.6rem; text-transform: uppercase; letter-spacing: .04em;
+      margin: 3rem 0 1rem; padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border); color: var(--white);
+    }
+    .content h3 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 1.15rem; text-transform: uppercase; letter-spacing: .06em;
+      margin: 2rem 0 .7rem; color: var(--amber);
+    }
+    .content p { margin-bottom: 1rem; color: #ccc9c2; }
+    .content ul, .content ol { margin: .5rem 0 1rem 1.4rem; color: #ccc9c2; }
+    .content li { margin-bottom: .4rem; }
+    .content strong { color: var(--white); font-weight: 600; }
+
+    /* subtitle / version badge */
+    .doc-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .version-badge {
+      background: var(--panel); border: 1px solid var(--border);
+      padding: .2rem .7rem; border-radius: 20px;
+      font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--amber); font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* callout boxes */
+    .callout {
+      border-left: 3px solid var(--amber); background: var(--panel);
+      padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0;
+    }
+    .callout.info { border-color: #4c9ff5; }
+    .callout.warn { border-color: #f5a623; }
+    .callout.tip  { border-color: #4caf7d; }
+    .callout-title {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      font-weight: 700; margin-bottom: .4rem;
+    }
+    .callout.info .callout-title { color: #4c9ff5; }
+    .callout.warn .callout-title { color: var(--amber); }
+    .callout.tip  .callout-title { color: #4caf7d; }
+    .callout p { margin: 0; }
+
+    /* step list */
+    .step-list { counter-reset: step; list-style: none; margin-left: 0; }
+    .step-list li {
+      counter-increment: step;
+      padding: .9rem 1rem .9rem 3.5rem;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-list li::before {
+      content: counter(step);
+      position: absolute; left: .8rem; top: .9rem;
+      background: var(--amber); color: var(--black);
+      width: 1.6rem; height: 1.6rem; border-radius: 50%;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* badge */
+    .badge {
+      display: inline-block;
+      font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .15rem .55rem; border-radius: 3px;
+      font-weight: 700; font-family: 'Barlow Condensed', sans-serif;
+      vertical-align: middle; margin-left: .4rem;
+    }
+    .badge-win { background: rgba(0,120,212,.25); color: #5ab0ff; border: 1px solid #5ab0ff44; }
+    .badge-soon { background: rgba(245,166,35,.15); color: var(--amber); border: 1px solid var(--amber)44; }
+
+    /* section divider */
+    .section-block { margin-bottom: 1.5rem; padding-bottom: 1.5rem; scroll-margin-top: 80px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="logo.png" alt="TruckOmeter">
+    <span>TruckOmeter</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="docs.html" class="active">Manual</a></li>
+    <li><a href="report.html">Report a Bug</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Getting Started</div>
+      <ul>
+        <li><a href="#install">Installation</a></li>
+        <li><a href="#first-run">First Run</a></li>
+        <li><a href="#setup">Truck & Trailer Setup</a></li>
+        <li><a href="#sync">Community Site Sync</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Core Features</div>
+      <ul>
+        <li><a href="#loads">Loads</a></li>
+        <li><a href="#fuel">Fuel</a></li>
+        <li><a href="#expenses">Expenses</a></li>
+        <li><a href="#drivers">Drivers & Pay</a></li>
+        <li><a href="#maintenance">Maintenance</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Reports</div>
+      <ul>
+        <li><a href="#ifta">IFTA Report</a></li>
+        <li><a href="#roi">ROI / P&L</a></li>
+        <li><a href="#detention">Detention Time</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Testers</div>
+      <ul>
+        <li><a href="#tester-account">Test Account</a></li>
+        <li><a href="#what-to-test">What to Test</a></li>
+        <li><a href="#known-issues">Known Issues</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1>Tester <em>Manual</em></h1>
+    <div class="doc-meta">
+      <span class="version-badge">Beta v1.0</span>
+      <span style="font-size:.8rem; color:var(--muted)">Windows Only · Updated May 2026</span>
+    </div>
+
+    <p>Welcome to the TruckOmeter beta program. This manual covers setup, core features,
+    and what we specifically need testers to evaluate. If you find a bug, use the
+    <a href="report.html" style="color:var(--amber)">Bug Report</a> page.</p>
+
+    <!-- ─── GETTING STARTED ─── -->
+    <div class="section-block" id="install">
+      <h2>Installation <span class="badge badge-win">Windows</span></h2>
+      <ol class="step-list">
+        <li>Open the <strong>Microsoft Store</strong> on your Windows PC.</li>
+        <li>Search for <strong>TruckOmeter</strong> or use the direct link provided by your program contact.</li>
+        <li>Click <strong>Get</strong> and wait for the download to complete.</li>
+        <li>Launch TruckOmeter from the Start menu or taskbar.</li>
+      </ol>
+      <div class="callout warn">
+        <div class="callout-title">⚠ Beta Notice</div>
+        <p>This is a beta release. You may encounter bugs. Your data is stored locally on your device.
+        Use the backup feature (Settings → Backup) after each session to protect your entries.</p>
+      </div>
+    </div>
+
+    <div class="section-block" id="first-run">
+      <h2>First Run</h2>
+      <p>On first launch, TruckOmeter will:</p>
+      <ol class="step-list">
+        <li>Ask you to <strong>sign in or create a free account</strong>. Use your real email — it's how you receive beta communications.</li>
+        <li>Walk you through the <strong>Minimal Setup</strong> wizard: enter your company name, add at least one truck and trailer.</li>
+        <li>Download the <strong>community site database</strong> (~2,300+ truck stops, warehouses, and delivery sites). This takes 20–30 seconds on a good connection. Do not close the app during sync.</li>
+        <li>Land on the main dashboard.</li>
+      </ol>
+    </div>
+
+    <div class="section-block" id="setup">
+      <h2>Truck & Trailer Setup</h2>
+      <p>Go to <strong>Settings → Fleet</strong> to add or edit trucks and trailers.</p>
+      <h3>Truck Fields</h3>
+      <ul>
+        <li><strong>Unit Number</strong> — your internal fleet number (e.g. T-01)</li>
+        <li><strong>Year / Make / Model</strong> — for display and odometer tracking</li>
+        <li><strong>VIN</strong> — optional but useful for maintenance records</li>
+        <li><strong>Odometer</strong> — enter your current reading at setup</li>
+      </ul>
+      <div class="callout tip">
+        <div class="callout-title">✓ Tip</div>
+        <p>Accurate odometer entry at setup is important. TruckOmeter estimates mileage
+        between loads; if your starting odometer is wrong, the estimates will drift.</p>
+      </div>
+    </div>
+
+    <div class="section-block" id="sync">
+      <h2>Community Site Sync</h2>
+      <p>TruckOmeter maintains a shared database of locations — truck stops, warehouses,
+      distribution centers, fuel stations — contributed by the user community.</p>
+      <ul>
+        <li><strong>First install:</strong> full download (~2,300 sites) runs automatically during setup.</li>
+        <li><strong>Returning logins:</strong> a silent delta sync runs in the background, pulling only new or changed sites.</li>
+        <li><strong>New site entry:</strong> when you type a ZIP code in a location field, the app checks Firestore for sites at that ZIP before prompting you to create a new one.</li>
+      </ul>
+      <div class="callout info">
+        <div class="callout-title">ℹ About Site Data</div>
+        <p>When you save a new site, it is automatically shared to the community database so other drivers benefit.
+        Sites are validated before sharing — address, coordinates, and state are required.</p>
+      </div>
+    </div>
+
+    <!-- ─── LOADS ─── -->
+    <div class="section-block" id="loads">
+      <h2>Loads</h2>
+      <p>Loads are the core of TruckOmeter. Every load tracks:</p>
+      <ul>
+        <li>Pickup and delivery locations (with scheduled times)</li>
+        <li>Freight rate (flat or per-mile)</li>
+        <li>Loaded miles and empty miles</li>
+        <li>Fuel consumed en route</li>
+        <li>Detention time at each stop</li>
+      </ul>
+      <h3>Adding a Load</h3>
+      <ol class="step-list">
+        <li>Tap <strong>+ New Load</strong> from the Loads screen.</li>
+        <li>Enter pickup location — start typing a city, ZIP, or site name. The app will suggest from the community database.</li>
+        <li>Add delivery location(s). You can have multiple stops.</li>
+        <li>Enter rate, truck assignment, and scheduled date/times.</li>
+        <li>Save. The load appears as <strong>Active</strong> until you mark it delivered.</li>
+      </ol>
+      <div class="callout warn">
+        <div class="callout-title">⚠ Tester Note</div>
+        <p>Please test loads with multiple delivery stops. The route calculation system was recently
+        rewritten to handle segment-by-segment routing. Report any mileage discrepancies.</p>
+      </div>
+    </div>
+
+    <!-- ─── FUEL ─── -->
+    <div class="section-block" id="fuel">
+      <h2>Fuel</h2>
+      <p>Track every diesel fill-up to:</p>
+      <ul>
+        <li>Calculate real MPG per trip and over time</li>
+        <li>Feed IFTA state tax calculations</li>
+        <li>Analyze fuel cost as a percentage of revenue per load</li>
+      </ul>
+      <h3>Fuel Entry Fields</h3>
+      <ul>
+        <li><strong>Date & Location</strong> — select the truck stop from the site database</li>
+        <li><strong>Gallons</strong> — total gallons pumped</li>
+        <li><strong>Price per gallon</strong></li>
+        <li><strong>Odometer</strong> at fill-up</li>
+        <li><strong>State</strong> — auto-populated from location; critical for IFTA</li>
+      </ul>
+      <div class="callout tip">
+        <div class="callout-title">✓ Tip — Saddle Tanks</div>
+        <p>If your truck has saddle tanks, they may not fill to the same level simultaneously.
+        Log each pump transaction separately to get accurate per-gallon data.</p>
+      </div>
+    </div>
+
+    <!-- ─── EXPENSES ─── -->
+    <div class="section-block" id="expenses">
+      <h2>Expenses</h2>
+      <p>Log any business expense: tires, tolls, lumper fees, truck washes, permits, etc.
+      Expenses can be assigned to a specific load (affecting that load's ROI) or marked
+      as general operating expenses (affecting the monthly P&L).</p>
+    </div>
+
+    <!-- ─── DRIVERS ─── -->
+    <div class="section-block" id="drivers">
+      <h2>Drivers & Pay</h2>
+      <div class="callout info">
+        <div class="callout-title">ℹ Design Note</div>
+        <p>Driver pay always appears as a cost — even if you are the driver. This is intentional.
+        Seeing your own labor as a cost builds accurate financial habits and prevents
+        underpricing loads. There is no toggle to hide this.</p>
+      </div>
+      <p>Driver pay can be set as:</p>
+      <ul>
+        <li>Cents per mile (loaded miles only, or all miles)</li>
+        <li>Percentage of gross load rate</li>
+        <li>Flat amount per load</li>
+      </ul>
+      <p>Pay stubs are generated per driver per pay period and can be exported as PDF.</p>
+    </div>
+
+    <!-- ─── MAINTENANCE ─── -->
+    <div class="section-block" id="maintenance">
+      <h2>Maintenance</h2>
+      <p>Log service records per truck or trailer:</p>
+      <ul>
+        <li>Oil changes, tire rotations, brake jobs, DOT inspections</li>
+        <li>Parts and labor cost (feeds expense reports)</li>
+        <li>Odometer at service (triggers interval reminders)</li>
+      </ul>
+    </div>
+
+    <!-- ─── REPORTS ─── -->
+    <div class="section-block" id="ifta">
+      <h2>IFTA Report</h2>
+      <p>TruckOmeter generates IFTA quarterly reports from your load and fuel data.
+      The report breaks down:</p>
+      <ul>
+        <li>Miles driven in each IFTA jurisdiction</li>
+        <li>Gallons purchased in each state (from fuel entries)</li>
+        <li>Tax owed or credit due per state</li>
+      </ul>
+      <div class="callout warn">
+        <div class="callout-title">⚠ Accuracy Requirement</div>
+        <p>IFTA calculations depend on accurate <strong>state tax rates</strong> and <strong>per-state mileage</strong>.
+        Always verify state fuel tax rates in the Settings before generating your quarterly report.
+        TruckOmeter syncs reference tax rates from the cloud but rates change — confirm with your
+        state's IFTA reporting authority before filing.</p>
+      </div>
+    </div>
+
+    <div class="section-block" id="roi">
+      <h2>ROI / Monthly P&L</h2>
+      <p>The ROI dashboard shows your real net income after:</p>
+      <ul>
+        <li>Fuel cost</li>
+        <li>Driver pay</li>
+        <li>Maintenance and expenses</li>
+        <li>Fixed costs (insurance, payments — enter in Settings → Fixed Expenses)</li>
+      </ul>
+      <p>View per-load ROI or monthly totals. Use this to evaluate which load types and
+      lanes are actually profitable vs. which ones just look good on paper.</p>
+    </div>
+
+    <div class="section-block" id="detention">
+      <h2>Detention Time Report (DTR)</h2>
+      <p>The DTR summarizes all detention events across a date range — shipper name,
+      hours detained, and estimated detention revenue owed. Use this as documentation
+      when disputing detention fees with brokers or shippers.</p>
+    </div>
+
+    <!-- ─── TESTER SECTION ─── -->
+    <div class="section-block" id="tester-account">
+      <h2>Test Account</h2>
+      <p>Your test credentials were provided separately. Use them to:</p>
+      <ul>
+        <li>Sign into the app on Windows</li>
+        <li>Create loads, fuel entries, and expenses with realistic data</li>
+        <li>Test the backup and restore flow (Settings → Backup)</li>
+      </ul>
+      <div class="callout warn">
+        <div class="callout-title">⚠ Test Data Notice</div>
+        <p>Do not enter real personal or financial data into the beta. Use realistic but
+        fictitious load rates, odometer readings, and routes for testing purposes.</p>
+      </div>
+    </div>
+
+    <div class="section-block" id="what-to-test">
+      <h2>What We Need You to Test</h2>
+      <p>Focus your testing on these areas (in priority order):</p>
+      <ol class="step-list">
+        <li><strong>Load Entry with Multiple Stops</strong> — add a load with 2+ pickups and 2+ deliveries. Verify mileage looks reasonable.</li>
+        <li><strong>Site Search</strong> — when adding a load location, search by city and by ZIP. Verify suggestions appear and are correct.</li>
+        <li><strong>Fuel Entry</strong> — log 3–5 fuel entries in different states. Verify state is auto-populated correctly.</li>
+        <li><strong>IFTA Report</strong> — generate an IFTA report for any date range containing your test loads. Check that states and miles look right.</li>
+        <li><strong>Backup & Restore</strong> — use Settings → Backup to save a backup, then Settings → Restore. Verify data is intact after restore.</li>
+        <li><strong>Odometer Checker</strong> — go to Tools → Odometer Checker and review any flagged entries.</li>
+      </ol>
+    </div>
+
+    <div class="section-block" id="known-issues">
+      <h2>Known Issues</h2>
+      <ul>
+        <li><strong>Odometer Checker accumulation</strong> — after advancing past a flagged entry, estimated odometer may jump back. Under investigation.</li>
+        <li><strong>PDF reports</strong> — Fuel Analysis, Load Summary, and Maintenance Report pages are locked (coming in a future update).</li>
+        <li><strong>Route recalculation</strong> — manually editing a load's miles after the route is calculated may not update the IFTA state split correctly. Workaround: delete and re-enter the load.</li>
+      </ul>
+      <p>Found something not on this list? <a href="report.html" style="color:var(--amber)">Submit a bug report →</a></p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active sidebar link on scroll
+  const sections = document.querySelectorAll('.section-block[id]');
+  const links = document.querySelectorAll('.sidebar a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
