@@ -304,6 +304,57 @@
       transition: opacity .55s ease, transform .55s ease;
     }
     .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── MOBILE NAV ─── */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: .4rem; background: none; border: none;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--white); border-radius: 2px;
+      transition: transform .25s, opacity .25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: var(--dark); border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem; z-index: 99; flex-direction: column; gap: .2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--muted); text-decoration: none;
+      font-size: 1rem; letter-spacing: .08em; text-transform: uppercase;
+      font-weight: 500; padding: .7rem 0;
+      border-bottom: 1px solid var(--border);
+      display: block;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover, .mobile-menu a.active { color: var(--amber); }
+    @media (max-width: 680px) {
+      .nav-links { display: none; }
+      .nav-cta   { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .hero { padding: 7rem 1.2rem 3rem; }
+      section { padding: 4rem 1.2rem; }
+      .stat-bar { padding: 1.5rem 1.2rem; }
+      .tester-inner { flex-direction: column; }
+      .tester-actions { width: 100%; }
+      .tester-actions .btn-primary,
+      .tester-actions .btn-ghost { width: 100%; text-align: center; }
+      footer { flex-direction: column; gap: 1rem; padding: 2rem 1.2rem; }
+      .footer-links { flex-wrap: wrap; gap: 1rem; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn-primary,
+      .hero-actions .btn-ghost { width: 100%; text-align: center; }
+      .form-card { padding: 1.5rem 1.2rem; }
+      .perks { flex-direction: column; align-items: flex-start; gap: .8rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -318,8 +369,18 @@
     <li><a href="docs.html">Manual</a></li>
     <li><a href="report.html">Testers</a></li>
   </ul>
-  <a class="nav-cta" href="beta.html">Become a Tester</a>
+  <a class="nav-cta" href="#download">Download</a>
+
+  <button class="hamburger" id="hbg" aria-label="Toggle menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="docs.html">Manual</a>
+  <a href="beta.html" class="active">Beta</a>
+  <a href="report.html">Bug Report</a>
+</div>
 
 <!-- ─── HERO ─── -->
 <section class="hero">
@@ -332,9 +393,10 @@
       into your real operating income. Built by a trucker, for truckers.
     </p>
     <div class="hero-actions">
-      <a class="btn-primary" href="beta.html">
-        Become a Beta Tester
+      <a class="btn-primary" href="#download">
+        Download Now
       </a>
+      <a class="btn-ghost" href="beta.html">Become a Beta Tester</a>
       <a class="btn-ghost" href="docs.html">Read the Manual</a>
     </div>
   </div>
@@ -425,26 +487,32 @@
   </div>
 </section>
 
-<!-- ─── PLATFORMS ─── -->
-<section class="platform-section">
+<!-- ─── PLATFORMS / DOWNLOAD ─── -->
+<section class="platform-section" id="download">
   <div class="section-inner">
     <p class="section-label reveal">Availability</p>
-    <h2 class="reveal">Your Platform,<br>Your Choice</h2>
+    <h2 class="reveal">Download<br><em style="color:var(--amber)">TruckOmeter</em></h2>
     <p class="lead reveal">
       TruckOmeter is built with .NET MAUI — one codebase, every platform.
     </p>
     <div class="platform-grid">
-      <div class="platform-card reveal">
+      <div class="platform-card reveal" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
         <span class="platform-icon">🖥️</span>
         <h4>Windows</h4>
         <span class="status status-live">● Live on Microsoft Store</span>
+        <a class="btn-primary" href="https://apps.microsoft.com/detail/9P06LH9ZC9TV" target="_blank" style="margin-top:.5rem;font-size:.85rem;padding:.6rem 1.4rem;">
+          Get on Windows
+        </a>
       </div>
-      <div class="platform-card reveal">
+      <div class="platform-card reveal" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
         <span class="platform-icon">📱</span>
         <h4>Android</h4>
-        <span class="status status-soon">○ Coming Soon</span>
+        <span class="status status-live">● Live on Google Play</span>
+        <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.truckometer.toapp" target="_blank" style="margin-top:.5rem;font-size:.85rem;padding:.6rem 1.4rem;">
+          Get on Android
+        </a>
       </div>
-      <div class="platform-card reveal">
+      <div class="platform-card reveal" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
         <span class="platform-icon">🍎</span>
         <h4>iOS / iPhone</h4>
         <span class="status status-soon">○ Coming Soon</span>
@@ -488,6 +556,22 @@
     });
   }, { threshold: 0.12 });
   reveals.forEach(r => io.observe(r));
+</script>
+
+<script>
+function toggleMenu(){
+  var h=document.getElementById('hbg');
+  var m=document.getElementById('mobileMenu');
+  h.classList.toggle('open');
+  m.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  var h=document.getElementById('hbg');
+  var m=document.getElementById('mobileMenu');
+  if(!h.contains(e.target)&&!m.contains(e.target)){
+    h.classList.remove('open');m.classList.remove('open');
+  }
+});
 </script>
 </body>
 </html>
